@@ -51,7 +51,7 @@ void pieceAssignment(gameState& g){
         return pieceAssignment(g);
     }
 
-    g.playerChoice = (choice == 0) ? 'xo' : 'ox';
+    g.playerChoice = (choice == 0) ? "xo" : "ox";
     cout << "Your pieces are set up!\n";
 }
 
@@ -65,11 +65,11 @@ void print_input_board(){
 }
 
 string set_up_board(gameState& g){
-    string editor = "";
+    string editor(6, ' ');
     string out = "";
 
     // "X|X|X\n"
-    for (int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++){ // 3 rows
         for (int j = 0; j < 6; j++){ // 6 is the length of each row of board
             if (j == 5){
                 editor[j] = '\n';
@@ -78,7 +78,7 @@ string set_up_board(gameState& g){
                 editor[j] = '|';
             }
             else{
-                editor[j] = g.board[i][j]; // getting values from the g.board 2D array
+                editor[j] = g.board[i][j/2]; // getting values from the g.board 2D array
             }
         }
         out += editor;
@@ -118,15 +118,12 @@ bool check_win(gameState& g){
                 if (g.gameState[player][k] == 9 && k < 2){ 
                     return false;
                 }
-
-                if (g.gameState[player][k] == win[i][j]){
-                    connect++;
-                }
+                connect += (g.gameState[player][k] == win[i][j]);
             }
-        }
 
-        if (connect == 3){
-            return true; // When there are three connecting pieces, return true
+            if (connect == 3){
+                return true; // When there are three connecting pieces, return true
+            }
         }
     }
 
@@ -135,24 +132,24 @@ bool check_win(gameState& g){
 
 
 void get_input(gameState& g){
-    int output;
+    int input;
     int player = (g.turn) ? 0 : 1;
     cout << "Type an integer from 0 to 8:";
-    while (!(cin >> output)){
+    while (!(cin >> input)){
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "An integer input expected. Try again: ";
     }
 
 
-    if (output > 8 || output < 0){
+    if (input > 8 || input < 0){
         cout << "\nOut of range.\n\n";
         return get_input(g);
     }
 
     for (int i = 0; i < 2; i++){
         for (int j = 0; j < 5; j++)
-            if (g.gameState[i][j] == output){ 
+            if (g.gameState[i][j] == input){ 
                 cout << "That square is occupied! Try again!\n";
                 return get_input(g);
             }
@@ -161,13 +158,13 @@ void get_input(gameState& g){
     //Update g.gameState
     for (int i = 0; i < 5; i++){
         if (g.gameState[player][i] == 9){
-            g.gameState[player][i] = output;
+            g.gameState[player][i] = input;
             break;
         }
     }
 
     //Update g.board
-    g.board[output / 3][output % 3] = g.playerChoice[player];
+    g.board[input / 3][input % 3] = g.playerChoice[player];
 
     //Update g.turn
     g.turn = !g.turn;
