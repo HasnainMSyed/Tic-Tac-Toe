@@ -1,4 +1,5 @@
 #include <vector>
+#include <stdexcept>
 #include <iostream>
 #include <cmath>
 
@@ -17,23 +18,36 @@
 */
 
 
-template <typename T>
 class Tensor {
 public:
-    // 1. Data Storage
-    std::vector<T> data;
-    
-    // 2. Shape / Dimensions (often called 'shape')
-    std::vector<int> shape;
-    
-    // 3. Strides (optional but highly recommended for efficiency)
-    std::vector<int> strides;
-    
-    // Rank is implicitly shape.size()
-    // int rank; 
+    //---- constructors ----
+    Tensor() = default;                       // empty tensor (0x0)
+    Tensor(int r, int c);                     // build rows=r, cols=c, UN-initialised memory
+
+    //---- shape queries ----
+    int rows() const { return rows_; }
+    int cols() const { return cols_; }
+    std::size_t size() const { return data_.size(); }   // == rows_*cols_
+
+    //---- element access ----
+    float& operator()(int r, int c);          // A(r,c) = x   (no bounds check, fast)
+    float  operator()(int r, int c) const;    // x = A(r,c)
+
+    float& at(int r, int c);                  // bounds-checked; throws if bad
+    float  at(int r, int c) const;
+
+    //---- tiny utilities ----
+    void fill(float val);                     // set every element to val
+    void print() const;                       // dump to std::cout for debugging
+
+private:
+    int rows_ = 0;
+    int cols_ = 0;
+    std::vector<float> data_;                 // row-major storage
 };
 
-
 int main(){
-    return 0;
+    Tensor A(3,3);
+    A(1,2) = 4.2;
+    std::cout << A(1,2);
 }
